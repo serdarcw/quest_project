@@ -1,5 +1,5 @@
 resource "aws_route53_record" "alb-record" {
-  name = local.web_site_name
+  name = var.web_site_name
   type = "A"
   zone_id = local.zone_id
 

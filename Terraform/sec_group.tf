@@ -1,9 +1,9 @@
 resource "aws_security_group" "ec2_sec_group" {
   name        = "ec2_sec_group"
-  description = "Allow SSH, HTTP inbound traffic"
+  description = "Allow SSH, HTTP and HTTPS inbound traffic"
   
   dynamic "ingress" {
-    for_each = var.serkan_dynamic_ports
+    for_each = var.ec2_dynamic_ports
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -19,7 +19,8 @@ resource "aws_security_group" "ec2_sec_group" {
   }
   
   tags = {
-    Name = "allow_ssh_http_https"
+    Name        = "allow_ssh_http_https"
+    Environment = var.stack_tag
   }
 }
 
@@ -27,20 +28,14 @@ resource "aws_security_group" "alb_sec_group" {
   name        = "alb_sec_group"
   description = "Allow SSH, HTTP inbound traffic"
   
-  ingress {
-    description = "HTTPS from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-
-  }
-  ingress {
-    description = "HTTP from anywhere"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.alb_dynamic_ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
   egress {
     from_port   = 0
@@ -50,7 +45,8 @@ resource "aws_security_group" "alb_sec_group" {
   }
   
   tags = {
-    Name = "allow_https_http"
+    Name        = "allow_ssh_http_https"
+    Environment = var.stack_tag
   }
 }
 
